@@ -1,36 +1,31 @@
-import os
-from PIL import Image
 import streamlit as st
+import cv2
+import numpy as np
 
-def find_dataset(directory_name):
-    for root, dirs, files in os.walk("."):
-        if directory_name in dirs:
-            return os.path.join(root, directory_name)
-    return None
+def load_image(file):
+    # Use OpenCV to load the image as a numpy array
+    img = cv2.imread(file)
+    
+    # Check if the image was loaded correctly
+    if img is None:
+        st.error("Error loading image. Please make sure you're passing a valid image file.")
+        return None
+    
+    # Convert the image from BGR to RGB format (since OpenCV uses BGR by default)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    
+    # Convert the numpy array to a PIL image
+    img = Image.fromarray(np.uint8(img))
+    
+    return img
 
-def load_image(file_path):
-    with open(file_path, 'rb') as file:
-        image = Image.open(file)
-        return image
+# Assuming you're getting the file from a file uploader
+file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png", "gif"])
 
-dataset_directory = find_dataset("Covid19-dataset")
-
-if dataset_directory is not None:
-    st.write("Dataset directory found.")
-
-    def load_images(directory_path):
-        images = []
-        for root, dirs, files in os.walk(directory_path):
-            for file in files:
-                if file.endswith(".jpg") or file.endswith(".png") or file.endswith(".jpeg"):
-                    file_path = os.path.join(root, file)
-                    image = load_image(file_path)
-                    images.append(image)
-        return images
-
-    images = load_images(dataset_directory)
-
-    for i, image in enumerate(images):
+if file is not None:
+    # Load the image using OpenCV
+    image = load_image(file)
+    
+    if image is not None:
+        # Display the image using Streamlit
         st.image(image, caption=f"Image {i + 1}", use_column_width=True)
-else:
-    st.write("Dataset directory not found.")
