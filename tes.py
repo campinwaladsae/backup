@@ -13,7 +13,7 @@ def load_image(file_path):
         image = Image.open(file)
         return image
 
-dataset_directory = find_dataset("Covid_19_Dataset")
+dataset_directory = find_dataset("Covid19-dataset")
 
 if dataset_directory is not None:
     st.write("Dataset directory found.")
